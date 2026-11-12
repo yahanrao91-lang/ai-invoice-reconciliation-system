@@ -1,0 +1,27 @@
+# 虚拟环境
+.venv/
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# 本地业务数据与运行数据库（不得提交）
+data/
+data/uploads/
+*.db
+*.sqlite3
+
+# 环境变量（含密钥）
+.env
+
+# 测试缓存
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 日志
+logs/
+
+# 报告导出
+exports/

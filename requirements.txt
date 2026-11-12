@@ -1,0 +1,31 @@
+# AI 智能票据审核与采购对账系统 — 依赖清单
+# 基于 Python 3.13 验证。OCR 采用 RapidOCR（ONNX，自包含中文模型），
+# 相比 PaddleOCR 更轻量且对 Python 3.13 兼容性更好（决策见 docs/architecture.md）。
+
+# Web 界面
+streamlit>=1.40
+
+# PDF 文本处理
+pymupdf>=1.24
+
+# Excel 读取与报告生成
+openpyxl>=3.1
+
+# 图片处理
+pillow>=10.0
+
+# 结构化数据校验
+pydantic>=2.7
+
+# 环境变量配置
+python-dotenv>=1.0
+
+# LLM API 调用（OpenAI-Compatible Chat Completions）
+requests>=2.31
+
+# 本地中文 OCR 引擎（自包含，ONNX Runtime）
+rapidocr-onnxruntime>=1.2.3
+
+# 测试
+pytest>=8.0
+pytest-cov>=4.1
