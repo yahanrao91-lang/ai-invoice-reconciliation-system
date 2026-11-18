@@ -96,7 +96,7 @@ SQLite 表（`db.py`）：
 |----|------|
 | `reconciliation_tasks` | 对账任务 |
 | `documents` | 原始文档（含 SHA-256，`UNIQUE(file_hash, task_id)` 防重复） |
-| `extraction_results` | 文档提取结果（方法/置信度/结构化 JSON/证据/缺失字段） |
+| `extraction_results` | 文档提取结果（方法/字段完整度参考值/结构化 JSON/证据/缺失字段） |
 | `business_documents` | 结构化业务单据（PO/Invoice/GRN，标量列 + `data_json`） |
 | `line_items` | 单据行明细（外键到 `business_documents`） |
 | `line_matches` | 商品匹配结果 |

@@ -2,7 +2,7 @@
 
 > 项目：AI 智能票据审核与采购对账系统
 > 检查日期：2026-11-12
-> 检查范围：80 个未跟踪文件（79 个项目文件 + 本清单自身），全部尚未 `git add`
+> 检查范围：81 个未跟踪文件（80 个项目文件 + 本清单自身），全部尚未 `git add`
 > 结论：**可以发布**；除「补拍截图 / 建仓与首次推送」等人工动作外，无阻塞项。
 
 ---
@@ -11,7 +11,7 @@
 
 **建议发布。** 在真实环境完成了以下验证，且未发现任何 CRITICAL/HIGH 级问题：
 
-- 92 项自动化测试全部通过（exit 0，0 失败 / 0 跳过 / 0 错误）。
+- 103 项自动化测试全部通过（exit 0，0 失败 / 0 跳过 / 0 错误）。
 - 真实 DeepSeek LLM 冒烟测试通过（发票字段验证 7/7），三单匹配场景 B 端到端实操通过（AI/OCR 提取 → `QTY_OVER_RECEIPT` → 人工审核 → Excel 报告）。
 - 敏感信息扫描全部为误报，无真实密钥 / 个人信息 / 真实票据入库。
 - 依赖完整，README 中的命令与当前目录结构一致。
@@ -24,49 +24,48 @@
 
 | # | 检查项 | 结果 | 说明 |
 |---|--------|------|------|
-| 1 | 完整 git status | ✅ 通过 | `No commits yet`，80 个未跟踪文件，无意外文件、无已跟踪误加 |
-| 2 | 文件核对（79+1） | ✅ 通过 | 见第八节清单，无遗漏、无多余 |
+| 1 | 完整 git status | ✅ 通过 | `No commits yet`，81 个未跟踪文件，无意外文件、无已跟踪误加 |
+| 2 | 文件核对（80+1） | ✅ 通过 | 见第八节清单，无遗漏、无多余 |
 | 3 | 七组虚构演示数据可公开 | ✅ 通过 | 21 个文件全部含「模拟票据｜非真实业务凭证」，无真实企业/个人信息 |
 | 4 | 敏感路径不被提交 | ✅ 通过 | `.env` `.venv/` `data/` `logs/` `exports/` `*.db` `*.sqlite3` `.coverage` 全部被 `git check-ignore` 命中 |
 | 5 | 敏感信息扫描 | ✅ 通过 | 56 个文本文件 7 处命中，**均为误报**（占位符/mock/代码字段名），无真实密钥、手机号、邮箱、身份证、银行卡 |
 | 6 | README 图片路径 | ✅ 通过 | `docs/screenshots/01_业务总览.png` 存在且被引用；其余 4 张为注释占位 |
 | 7 | README 命令与目录一致 | ✅ 通过 | 绝对路径与 `.venv\Scripts\python.exe` 用法均与实际一致 |
 | 8 | requirements.txt 依赖完整 | ✅ 通过 | 本轮补充缺失的 `pytest-cov>=4.1`，venv 实测 pytest 9.2.0 / pytest-cov 7.1.0 |
-| 9 | pytest 92 项通过 | ✅ 通过 | 本轮实测 `92 passed`（223.82s，exit 0），见第三节 |
+| 9 | pytest 103 项通过 | ✅ 通过 | 本轮实测 `103 passed`（exit 0，覆盖率 88%），见第三节 |
 | 10 | 临时/残留/大文件 | ✅ 通过 | 无 `.tmp/.bak/.pyc` 残留，无 >1MB 文件 |
-| 11 | 发布文件清单 | ✅ 通过 | 见第八节，共 80 个（含本清单） |
+| 11 | 发布文件清单 | ✅ 通过 | 见第八节，共 81 个（含本清单） |
 | 12 | 仓库简介与标签 | ✅ 已给出 | 见第十节 |
 
 ---
 
 ## 三、自动化测试结果（本轮实测）
 
-后台任务 `b0hoqkuf8` 完整输出：
+后台任务 `b6qwm9el0`（`pytest --cov`）完整结果：
 
 ```
-........................................................................ [ 78%]
-....................                                                     [100%]
-92 passed in 223.82s (0:03:43)
+103 tests collected → 103 passed（exit 0）
+TOTAL 1736 stmts，88% 行覆盖率
 
 [exited with code 0]
 ```
 
 | 项目 | 结果 |
 |------|------|
-| 收集测试数量（`--collect-only`） | **92 tests collected in 0.59s** |
-| 通过 | **92 passed** |
+| 收集测试数量（`--collect-only`） | **103 tests collected**（10 个测试文件，per-file 计数合计 103 例） |
+| 通过 | **103 passed** |
 | 失败 / 跳过 / 错误 | **0 / 0 / 0**（输出全为 `.`，无 `F`/`s`/`E`/`x` 标记） |
 | 退出码 | **0** |
-| 耗时 | 223.82s（0:03:43），主要来自 Streamlit AppTest 页面渲染 |
+| 耗时 | 159.52s（约 2 分 40 秒），主要来自 Streamlit AppTest 页面渲染 |
 | pytest 版本 | 9.2.0（当前 `.venv` 实测） |
 | pytest-cov 版本 | 7.1.0（当前 `.venv` 实测） |
-| 测试函数定义数 | 86 个 `def test_`（含参数化展开为 92 例） |
+| 测试函数定义数 | 97 个 `def test_`（含参数化展开为 103 例） |
 
 **是否通过删除测试 / 降低断言获得成功：否。** 依据：
 
-- `--collect-only` 收集数 = 92，与 `92 passed` 完全一致，不存在被跳过、被 deselected 或收集不到的用例。
+- `--collect-only` 收集数 = 103，与 `103 passed` 完全一致，不存在被跳过、被 deselected 或收集不到的用例。
 - `tests/` 下 11 个测试文件全部完整（见第八节），本轮未删除、未改动任何测试文件。
-- 历轮审计均为**只增测试**（45 → 92），从未删除测试或弱化断言。
+- 历轮审计均为**只增测试**（45 → 103），从未删除测试或弱化断言。
 
 ---
 
@@ -120,15 +119,15 @@ pytest-cov>=4.1            # 覆盖率（本轮补充）
 
 - 结构完整：业务背景 → 核心能力 → 技术栈 → 目录结构 → 安装与启动 → 演示场景 → 测试 → 局限性 → 安全与合规。
 - 图片路径：`![首页：业务总览](docs/screenshots/01_业务总览.png)` 指向的文件真实存在（69KB 有效 PNG）；其余 4 张为注释占位，不破坏渲染。
-- 命令一致性：README 中绝对路径与 `.venv\Scripts\python.exe` 用法均与当前目录结构一致；测试数（92）与覆盖率（88%）与实际一致。
+- 命令一致性：README 中绝对路径与 `.venv\Scripts\python.exe` 用法均与当前目录结构一致；测试数（103）与覆盖率（88%）与实际一致。
 - 真实 AI 说明：第 5 节给出 DeepSeek 配置与 `scripts/smoke_test_llm.py` 命令，明确「不打印 API Key」。
 - 场景 B 实测结果、快速演示（3～5 分钟）小节均已补入。
 
 ---
 
-## 八、预计提交文件清单（80 个）
+## 八、预计提交文件清单（81 个）
 
-> 79 个项目文件 + 本清单自身（`docs/github_release_checklist.md`）= 80 个未跟踪文件，首次提交全部入库。
+> 80 个项目文件 + 本清单自身（`docs/github_release_checklist.md`）= 81 个未跟踪文件，首次提交全部入库。
 
 ### 根目录（7）
 ```
@@ -159,11 +158,11 @@ screenshots/README.md  screenshots/01_业务总览.png
 generate_demo_data.py  smoke_test_llm.py
 ```
 
-### src/invoice_matching/（27）
+### src/invoice_matching/（28）
 ```
 __init__.py  anomalies.py  config.py  db.py  detection.py  document_import.py
 logging_config.py  models.py  pipeline.py  report.py  review.py  schemas.py
-ai/__init__.py  ai/extractor.py  ai/llm_provider.py  ai/offline_parser.py  ai/prompts.py
+ai/__init__.py  ai/extractor.py  ai/field_applicability.py  ai/llm_provider.py  ai/offline_parser.py  ai/prompts.py
 extraction/__init__.py  extraction/base.py  extraction/excel_extractor.py  extraction/ocr.py  extraction/pdf_extractor.py
 processing/__init__.py  processing/aliases.py  processing/matching.py  processing/standardize.py  processing/validate.py
 ```
@@ -175,7 +174,7 @@ test_extraction.py  test_llm_provider.py  test_matching.py  test_report.py
 test_review_db.py  test_standardize.py
 ```
 
-**合计：80 个。**
+**合计：81 个。**
 
 ---
 
@@ -211,5 +210,5 @@ finance-automation  human-in-the-loop  pytest
 ## 十一、如实声明（不夸大）
 
 - 本项目为**个人独立开发的学习/求职原型**，未上线、无真实客户、无商业部署、无营收数据。
-- 真实验收覆盖：一次真实 DeepSeek 冒烟测试（字段验证 7/7）+ 一组演示场景（场景 B）端到端实操 + 92 项 pytest 全通过 + 88% 行覆盖率（覆盖率沿用上一轮带 `--cov` 的实测，本轮复跑 `pytest` 确认 92 项通过）。
+- 真实验收覆盖：一次真实 DeepSeek 冒烟测试（字段验证 7/7）+ 一组演示场景（场景 B）端到端实操 + 103 项 pytest 全通过 + 88% 行覆盖率（本轮带 `--cov` 实测）。
 - **未声称所有生产环境功能已验证**：多用户并发、权限隔离、真实税务查验、ERP/付款对接均不在本项目范围。

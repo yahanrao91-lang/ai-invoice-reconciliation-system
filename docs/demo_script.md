@@ -6,7 +6,7 @@
 ## 准备（提前 1 分钟）
 
 ```bash
-cd "D:\eGG\Python学习咪咪\AI票据审核与采购对账系统"
+# 在项目根目录（包含 app.py 的目录）下执行
 .venv\Scripts\python.exe scripts\generate_demo_data.py   # 生成 7 组虚构演示文件
 .venv\Scripts\python.exe -m streamlit run app.py        # 启动界面
 ```

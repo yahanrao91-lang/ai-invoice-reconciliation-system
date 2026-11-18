@@ -84,7 +84,7 @@ AI票据审核与采购对账系统/
 │   └── processing/            # 标准化、别名、验证、匹配
 ├── scripts/generate_demo_data.py   # 生成演示数据
 ├── demo_data/                 # 7 组演示场景（脚本生成）
-├── tests/                     # pytest（92 项，覆盖率 88%）
+├── tests/                     # pytest（103 项，覆盖率 88%）
 └── docs/                      # 文档
 ```
 
@@ -95,7 +95,7 @@ AI票据审核与采购对账系统/
 ### 1. 创建虚拟环境并安装依赖
 
 ```bash
-cd "D:\eGG\Python学习咪咪\AI票据审核与采购对账系统"
+# 在项目根目录（包含 app.py 的目录）下执行
 python -m venv .venv
 .venv\Scripts\python.exe -m pip install --upgrade pip
 .venv\Scripts\python.exe -m pip install -r requirements.txt
@@ -190,20 +190,31 @@ LLM_MODEL=deepseek-flash
 
 ### 系统截图
 
-实际运行界面截图（首页：业务总览）：
+系统实际运行界面截图（演示数据均为虚构）：
 
-![首页：业务总览](docs/screenshots/01_业务总览.png)
+1. **业务总览**：任务、文档与整体处理状态一览。
 
-> 其余页面截图请放入 `docs/screenshots/`（命名建议 `02_AI信息提取.png`、`03_三单匹配.png`、`04_人工审核.png`、`05_历史报告.png`），并取消下方注释引用：
+   ![业务总览](docs/screenshots/01_业务总览.png)
 
-```markdown
-<!--
-![AI 信息提取](docs/screenshots/02_AI信息提取.png)
-![三单匹配](docs/screenshots/03_三单匹配.png)
-![人工审核](docs/screenshots/04_人工审核.png)
-![历史记录与报告](docs/screenshots/05_历史报告.png)
--->
-```
+2. **AI 信息提取**：展示文档类型、提取方式、字段完整度参考值、缺失字段提醒，以及 OCR/原文、结构化 JSON、字段来源证据三个标签页。
+
+   ![AI 信息提取](docs/screenshots/02_AI信息提取.png)
+
+3. **字段来源证据**：AI 提取字段与原始文本片段对照，便于人工复核，保证可追溯。
+
+   ![字段来源证据](docs/screenshots/03_字段来源证据.png)
+
+4. **三单匹配**：PO / Invoice / GRN 三单核对结果与异常检测列表。
+
+   ![三单匹配](docs/screenshots/04_三单匹配.png)
+
+5. **人工审核历史**：字段修正与异常确认/驳回的审核留痕。
+
+   ![人工审核历史](docs/screenshots/05_人工审核历史.png)
+
+6. **Excel 对账报告**：可下载的对账报告汇总页。
+
+   ![Excel 对账报告](docs/screenshots/06_Excel对账报告.png)
 
 ---
 
@@ -214,7 +225,7 @@ LLM_MODEL=deepseek-flash
 .venv\Scripts\python.exe -m pytest --cov=invoice_matching --cov-report=term-missing
 ```
 
-实测结果：**92 项测试全部通过，行覆盖率 88%**（详见 `docs/final_quality_audit.md`）。真实 LLM（DeepSeek）冒烟测试已通过（字段验证 7/7），另附 mock 测试覆盖 Provider 的异常/校验/重试/密钥保护逻辑。
+实测结果：**103 项测试全部通过，行覆盖率 88%**（详见 `docs/final_quality_audit.md`）。真实 LLM（DeepSeek）冒烟测试已通过（字段验证 7/7），另附 mock 测试覆盖 Provider 的异常/校验/重试/密钥保护逻辑。
 
 ---
 

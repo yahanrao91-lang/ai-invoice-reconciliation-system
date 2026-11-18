@@ -8,6 +8,13 @@ from invoice_matching.ai.extractor import (
     extract_with_llm,
     extract_with_llm_retry,
     parse_json,
+    schema_to_result,
+)
+from invoice_matching.ai.field_applicability import (
+    APPLICABLE_FIELDS,
+    canonical_field,
+    compute_completeness,
+    filter_applicable_missing_fields,
 )
 from invoice_matching.ai.llm_provider import LlmError
 from invoice_matching.ai.offline_parser import parse_offline
@@ -104,3 +111,120 @@ def test_offline_parser_missing_field_nulls():
     result = parse_offline(text)
     assert result.data.po_number is None
     assert "采购订单编号" in result.missing_fields
+
+
+# ---------------------------------------------------------------------------
+# 文档类型字段适用性：GRN 不适用字段过滤 + 字段完整度参考值
+# ---------------------------------------------------------------------------
+
+
+def test_applicable_fields_covers_all_document_types():
+    assert set(APPLICABLE_FIELDS) == {
+        "purchase_order", "invoice", "goods_receipt_note",
+    }
+    grn = APPLICABLE_FIELDS["goods_receipt_note"]
+    # GRN 不应包含 PO/发票的交易金额字段
+    assert "total_amount" not in grn
+    assert "line_items.quantity" not in grn
+    assert "line_items.unit_price" not in grn
+    assert "line_items.received_qty" in grn
+
+
+def test_canonical_field_normalizes_line_item_paths():
+    assert canonical_field("line_items[0].quantity") == "line_items.quantity"
+    assert canonical_field("line_items[1].received_qty") == "line_items.received_qty"
+    assert canonical_field("line_items[*].unit") == "line_items.unit"
+    assert canonical_field("line_items.name") == "line_items.name"
+    assert canonical_field("total_amount") == "total_amount"
+
+
+def test_grn_filters_out_non_applicable_missing_fields():
+    missing = [
+        "document_code",
+        "buyer_name",
+        "buyer_tax_no",
+        "total_amount",
+        "line_items[0].quantity",
+        "line_items[0].unit_price",
+        "line_items[0].amount",
+        "line_items[0].tax_rate",
+        "line_items[0].tax_amount",
+        "line_items[0].line_total",
+    ]
+    assert filter_applicable_missing_fields("goods_receipt_note", missing) == []
+
+
+def test_grn_keeps_truly_missing_received_qty():
+    missing = ["line_items[0].received_qty", "line_items[0].quantity", "total_amount"]
+    filtered = filter_applicable_missing_fields("goods_receipt_note", missing)
+    assert filtered == ["line_items[0].received_qty"]
+
+
+def test_grn_completeness_is_1_0_when_all_applicable_fields_present():
+    missing = [
+        "document_code", "buyer_name", "total_amount",
+        "line_items[0].quantity", "line_items[0].unit_price",
+    ]
+    assert compute_completeness("goods_receipt_note", missing) == 1.0
+
+
+def test_grn_missing_received_qty_lowers_completeness():
+    assert compute_completeness(
+        "goods_receipt_note", ["line_items[0].received_qty"]
+    ) == 0.9
+
+
+def test_po_applicability_not_affected_by_grn_rules():
+    missing = [
+        "line_items[0].received_qty", "line_items[0].planned_qty",
+        "total_amount", "buyer_name",
+    ]
+    filtered = filter_applicable_missing_fields("purchase_order", missing)
+    assert filtered == ["total_amount", "buyer_name"]
+
+
+def test_invoice_applicability_not_affected_by_grn_rules():
+    missing = [
+        "line_items[0].received_qty", "document_code",
+        "related_po_number", "line_items[0].quantity",
+    ]
+    filtered = filter_applicable_missing_fields("invoice", missing)
+    assert filtered == ["document_code", "related_po_number", "line_items[0].quantity"]
+
+
+def test_unknown_missing_field_is_preserved_not_silently_dropped():
+    assert filter_applicable_missing_fields(
+        "goods_receipt_note", ["some_unknown_field"]
+    ) == ["some_unknown_field"]
+
+
+def test_schema_to_result_grn_filters_missing_and_keeps_review_evidence():
+    s = validate_document_schema({
+        "document_type": "goods_receipt_note",
+        "document_number": "GRN-1",
+        "related_po_number": "PO-1",
+        "supplier_name": "供应商A",
+        "line_items": [{"item_no": "I-1", "name": "轴承",
+                        "planned_qty": 100, "received_qty": 95}],
+        "missing_fields": ["document_code", "total_amount", "line_items[0].quantity"],
+        "needs_review": ["收货数量与计划数量不符"],
+        "evidence": {"document_number": "GRN-1"},
+    })
+    result = schema_to_result(s)
+    assert result.missing_fields == []
+    assert result.needs_review == ["收货数量与计划数量不符"]
+    assert result.evidence == {"document_number": "GRN-1"}
+    assert result.confidence == 1.0
+
+
+def test_schema_to_result_grn_missing_received_qty_kept():
+    s = validate_document_schema({
+        "document_type": "goods_receipt_note",
+        "document_number": "GRN-1",
+        "line_items": [{"name": "轴承", "planned_qty": 100}],
+        "missing_fields": ["line_items[0].received_qty", "total_amount"],
+    })
+    result = schema_to_result(s)
+    assert "line_items[0].received_qty" in result.missing_fields
+    assert "total_amount" not in result.missing_fields
+    assert result.confidence == 0.9

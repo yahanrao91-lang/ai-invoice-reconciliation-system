@@ -30,6 +30,7 @@ from ..processing.standardize import (
     quantize_qty,
 )
 from ..schemas import DocumentSchema, validate_document_schema
+from .field_applicability import compute_completeness, filter_applicable_missing_fields
 from .llm_provider import LlmError, LlmProvider
 from .prompts import SYSTEM_PROMPT, build_user_prompt
 
@@ -64,14 +65,18 @@ def parse_json(raw: str) -> dict:
 def schema_to_result(schema: DocumentSchema, raw_text: str = "") -> ExtractionResult:
     dt = _TYPE_MAP[schema.document_type]
     data = _build_entity(dt, schema)
-    confidence = max(0.2, round(1.0 - 0.1 * len(schema.missing_fields or []), 2))
+    # 只保留「当前文档类型适用」的缺失字段，避免其它类型的字段拉低完整度参考值。
+    applicable_missing = filter_applicable_missing_fields(
+        schema.document_type, schema.missing_fields
+    )
+    confidence = compute_completeness(schema.document_type, schema.missing_fields)
     return ExtractionResult(
         document_type=dt,
         data=data,
         evidence=schema.evidence or {},
         method=ExtractionMethod.AI,
         confidence=confidence,
-        missing_fields=schema.missing_fields or [],
+        missing_fields=applicable_missing,
         needs_review=schema.needs_review or [],
         raw_text=raw_text,
     )

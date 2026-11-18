@@ -3,7 +3,7 @@
 ## 1. 首次安装
 
 ```bash
-cd "D:\eGG\Python学习咪咪\AI票据审核与采购对账系统"
+# 在项目根目录（包含 app.py 的目录）下执行
 python -m venv .venv
 .venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
@@ -42,7 +42,7 @@ Windows 也可双击 `run.bat` 一键启动。
 ### 4.3 AI 信息提取
 
 1. 选择任务与文档。
-2. 查看：文档类型、提取方式（text/ocr/ai/offline/manual）、可信度参考值、缺失字段提醒。
+2. 查看：文档类型、提取方式（text/ocr/ai/offline/manual）、字段完整度参考值、缺失字段提醒。
 3. 三个标签页：OCR/原始文本、结构化 JSON、字段来源证据。
 4. 如需修正：填写「字段路径」（如 `supplier_name`、`total_amount`、`lines[0].quantity`）、新值、原因、审核人，点击「保存修正」。修正会保留修改前后值并写入审计记录。
 

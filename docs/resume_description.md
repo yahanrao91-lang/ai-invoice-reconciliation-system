@@ -11,17 +11,17 @@
 ### 可写进简历的要点（技术栈 + 做了什么）
 
 - **Python 企业自动化**：基于 Python 3.13 构建模块化后端，分层设计（导入、提取、AI、标准化、验证、匹配、持久化、报告、Web），业务规则与 AI 模块解耦；使用 `Decimal` 统一金额计算避免浮点误差，业务容差集中配置。
-- **AI 文档理解与 LLM 集成**：实现 OpenAI-Compatible Chat Completions 适配层（`LLM_BASE_URL/API_KEY/MODEL` 可配置），设计结构化提取 Prompt，输出经 Pydantic JSON Schema 校验、失败有限重试、字段级原始文本证据与可信度参考；支持无 API Key 的本地离线解析模式，提取方式全程可标识。已用真实 DeepSeek API（`deepseek-flash`）完成冒烟测试，发票字段验证 7/7，PO/Invoice/GRN 三份文件真实 AI 结构化提取通过。
+- **AI 文档理解与 LLM 集成**：实现 OpenAI-Compatible Chat Completions 适配层（`LLM_BASE_URL/API_KEY/MODEL` 可配置），设计结构化提取 Prompt，输出经 Pydantic JSON Schema 校验、失败有限重试、字段级原始文本证据与字段完整度参考值；支持无 API Key 的本地离线解析模式，提取方式全程可标识。已用真实 DeepSeek API（`deepseek-flash`）完成冒烟测试，发票字段验证 7/7，PO/Invoice/GRN 三份文件真实 AI 结构化提取通过。
 - **本地 OCR**：集成 RapidOCR（ONNX 中文模型）实现 PDF 扫描件与图片的中文票据识别，OCR 抽象层支持多引擎切换与不可用状态的显式处理。
 - **业务规则引擎（三单匹配）**：实现供应商/订单/商品/数量/单价/金额核对与重复发票识别，支持部分收货、分批开票与收货数量聚合，异常按严重程度逐条记录并区分差异类型。
 - **数据持久化与追溯**：设计 SQLite 关系模型（10 张表，含外键、索引、唯一约束防重复），所有匹配结果与人工修正可追溯到原始文档。
 - **人工审核闭环（Human-in-the-Loop）**：实现字段修正（保留修改前后值、时间、原因）与异常确认/驳回工作流，重大异常不自动放行。
 - **可视化与报告**：Streamlit 全中文六页界面；openpyxl 生成含 7 个工作表的 Excel 对账报告（异常着色、自动筛选、冻结窗格）。
-- **工程质量**：pytest 建立 92 项自动化测试（含端到端真实文件流程、Streamlit AppTest、API mock 测试），行覆盖率 88%；提供 7 组可直接运行的演示场景、真实 LLM 冒烟测试脚本与完整文档。
+- **工程质量**：pytest 建立 103 项自动化测试（含端到端真实文件流程、Streamlit AppTest、API mock 测试），行覆盖率 88%；提供 7 组可直接运行的演示场景、真实 LLM 冒烟测试脚本与完整文档。
 
 ### 可量化的诚实数据
 
-- 自动化测试 92 项全部通过，行覆盖率 88%。
+- 自动化测试 103 项全部通过，行覆盖率 88%。
 - 端到端处理 3 种文件格式（PDF/PNG/XLSX）与 7 组演示场景，异常识别符合预期。
 - 真实 DeepSeek API 冒烟测试通过（字段验证 7/7）；场景 B 经界面端到端实操（导入 → AI/OCR 提取 → 三单匹配 → 异常人工确认 → SQLite 持久化 → Excel 报告）。
 - 核心代码约 1600+ 行（`src/`），文档 9 份。
@@ -37,7 +37,7 @@
 ## 建议的简历条目（精简版）
 
 > **AI 智能票据审核与采购对账系统**（Python / Streamlit / OCR / LLM / SQLite）—— 个人项目
-> 独立设计并实现企业采购三单自动核对系统：集成 RapidOCR 中文票据识别与 OpenAI-Compatible LLM 结构化提取（Pydantic 校验 + 重试 + 离线模式，已实测 DeepSeek 字段验证 7/7），实现基于 Decimal 的规则匹配引擎（供应商/商品/数量/单价/金额/重复发票核对），SQLite 持久化 + 人工审核留痕 + Excel 报告生成；建立 92 项 pytest 自动化测试，覆盖率 88%。
+> 独立设计并实现企业采购三单自动核对系统：集成 RapidOCR 中文票据识别与 OpenAI-Compatible LLM 结构化提取（Pydantic 校验 + 重试 + 离线模式，已实测 DeepSeek 字段验证 7/7），实现基于 Decimal 的规则匹配引擎（供应商/商品/数量/单价/金额/重复发票核对），SQLite 持久化 + 人工审核留痕 + Excel 报告生成；建立 103 项 pytest 自动化测试，覆盖率 88%。
 
 ---
 

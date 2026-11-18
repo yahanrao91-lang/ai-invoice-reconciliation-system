@@ -9,6 +9,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 import streamlit as st  # noqa: E402
 
+from invoice_matching.ai.field_applicability import (  # noqa: E402
+    compute_completeness,
+    filter_applicable_missing_fields,
+)
 from invoice_matching.config import settings  # noqa: E402
 from invoice_matching.db import Database  # noqa: E402
 from invoice_matching.extraction.ocr import OcrManager  # noqa: E402
@@ -175,14 +179,22 @@ def page_extraction():
         st.warning("该文档尚未完成结构化提取。")
         return
 
+    # 历史数据按当前文档类型动态过滤缺失字段并重算展示值，无需改写数据库记录。
+    applicable_missing = filter_applicable_missing_fields(
+        ext["doc_type"], ext["missing_fields"]
+    )
+    completeness = compute_completeness(ext["doc_type"], ext["missing_fields"])
+
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("文档类型", _DOC_TYPE_LABEL.get(ext["doc_type"], "未识别"))
     c2.metric("提取方式", ext["method"])
-    c3.metric("可信度参考值", f"{ext['confidence']:.2f}")
-    c4.metric("缺失字段", len(ext["missing_fields"] or []))
+    c3.metric("字段完整度参考值", f"{completeness:.2f}")
+    c4.metric("缺失字段", len(applicable_missing))
 
-    if ext["missing_fields"]:
-        st.warning("缺失字段提醒：" + "、".join(ext["missing_fields"]))
+    st.caption("该值根据当前文档类型适用字段的缺失情况计算，仅用于字段完整性参考，不代表 AI 模型准确率或票据真实性。")
+
+    if applicable_missing:
+        st.warning("缺失字段提醒：" + "、".join(applicable_missing))
     if ext["needs_review"]:
         st.info("待确认事项：" + "；".join(ext["needs_review"]))
 

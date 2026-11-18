@@ -117,7 +117,7 @@ class Pipeline:
         self.db.save_business_document(task_id, document_id, result.document_type, result.data)
         self.db.add_audit_log(
             task_id, "结构化提取",
-            f"{doc['original_name']} -> {result.document_type.label}（方式：{result.method.value}，置信度 {result.confidence}）",
+            f"{doc['original_name']} -> {result.document_type.label}（方式：{result.method.value}，字段完整度参考值 {result.confidence}）",
         )
         return {
             "ok": True,
